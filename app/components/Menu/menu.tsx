@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import { getMenu } from "@/api/menu";
 import CoursesIcon from "../../../utils/img/courses.svg";
 import ServicesIcon from "../../../utils/img/services.svg";
 import BooksIcon from "../../../utils/img/books.svg";
 import ProductsIcon from "../../../utils/img/products.svg";
-import { FirstLevelMenuItem } from "@/app/interfaces/menu.interface";
+import { FirstLevelMenuItem, MenuItem, PageItem } from "@/app/interfaces/menu.interface";
 import { TopLevelCategory } from "@/app/interfaces/page.interface";
 import cn from "classnames";
-import { useContext } from "react";
-import { AppContext } from "@/context/app.context";
 
 import styles from "./menu.module.css";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 
 const firstLevelMenu: FirstLevelMenuItem[] = [
     { route: "courses", name: "Курсы", icon: <CoursesIcon />, id: TopLevelCategory.Courses },
@@ -20,17 +20,29 @@ const firstLevelMenu: FirstLevelMenuItem[] = [
     { route: "products", name: "Продукты", icon: <ProductsIcon />, id: TopLevelCategory.Products },
 ];
 
-export default async function Menu() {
-    //const menu = await getMenu(0);
-    const { menu, setMenu, firstCategory } = useContext(AppContext);
+export default function Menu({ menu }: { menu: MenuItem[] }) {
+    const pathname = usePathname();
 
-    const buildFirstLevel = () => {
+    const [localMenu, setLocalMenu] = useState<MenuItem[]>(menu);
+
+    const openSecondLevel = (secondCategory: string) => {
+        setLocalMenu(
+            menu.map((m) => {
+                if (m._id.secondCategory == secondCategory) {
+                    m.isOpened = !m.isOpened;
+                }
+                return m;
+            })
+        );
+    };
+
+    const buildFirstLevel = (firstCategory: number) => {
         return (
             <>
                 {firstLevelMenu.map((el) => {
                     return (
                         <div key={el.route}>
-                            <a href={`/${el.route}`}>
+                            <Link href={`/${el.route}`}>
                                 <div
                                     className={cn(styles.firstLevel, {
                                         [styles.firstLevelActive]: el.id == firstCategory,
@@ -39,29 +51,62 @@ export default async function Menu() {
                                     {el.icon}
                                     <span>{el.name}</span>
                                 </div>
-                            </a>
-                            {el.id == firstCategory && buildSecondLevel()}
+                            </Link>
+                            {el.id == firstCategory && buildSecondLevel(el.route)}
                         </div>
                     );
                 })}
             </>
         );
     };
-    const buildSecondLevel = () => {
+    const buildSecondLevel = (route: string) => {
         return (
-            <div>
-                {/* {menu.map((el) => {
-                    return <div></div>;
-                })} */}
+            <div className={styles.secondBlock}>
+                {localMenu.map((el) => {
+                    if (el.pages.map((p) => p.alias).includes(pathname.split("/")[2])) {
+                        console.log("work", pathname.split("/")[2]);
+                        el.isOpened = true;
+                    }
+                    return (
+                        <div key={el._id.secondCategory}>
+                            <div className={styles.secondLevel} onClick={() => openSecondLevel(el._id.secondCategory)}>
+                                {el._id.secondCategory}
+                            </div>
+                            <div
+                                className={cn(styles.secondLevelBlock, {
+                                    [styles.secondLevelBlockOpened]: el.isOpened,
+                                })}
+                            >
+                                {buildThirdLevel(el.pages, route)}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         );
     };
-    const buildThirdLevel = () => {
-        return <></>;
+    const buildThirdLevel = (pages: PageItem[], route: string) => {
+        return (
+            <div>
+                {pages.map((el) => {
+                    return (
+                        <Link
+                            key={el.alias}
+                            href={`/${route}/${el.alias}`}
+                            className={cn(styles.thirdLevel, {
+                                [styles.thirdLevelActive]: `/${route}/${el.alias}` == pathname,
+                            })}
+                        >
+                            {el.category}
+                        </Link>
+                    );
+                })}
+            </div>
+        );
     };
     return (
         <>
-            <ul>{buildFirstLevel()}</ul>
+            <ul>{buildFirstLevel(0)}</ul>
         </>
     );
 }
