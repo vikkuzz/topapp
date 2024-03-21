@@ -1,0 +1,4 @@
+.header {
+  border: 1px solid tomato;
+  grid-area: header;
+}
