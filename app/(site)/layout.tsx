@@ -3,16 +3,16 @@ import { Noto_Sans_KR } from "next/font/google";
 import "../globals.css";
 
 const notoSans = Noto_Sans_KR({
-  subsets: ["latin", "cyrillic"],
-  weight: ["400", "500", "600", "700", "900"],
+    subsets: ["latin", "cyrillic"],
+    weight: ["400", "500", "600", "700", "900"],
 });
 
 import styles from "./page.module.css";
 import { Header } from "../components/Header/Header";
 import { Sidebar } from "../components/Sidebar/Sidebar";
 import { Footer } from "../components/Footer/Footer";
-import { FunctionComponent } from "react";
-import { AppContextProvider, IAppContext } from "@/context/app.context";
+// import { FunctionComponent } from "react";
+// import { AppContextProvider, IAppContext } from "@/context/app.context";
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -20,34 +20,34 @@ import { AppContextProvider, IAppContext } from "@/context/app.context";
 // };
 
 export default function RootLayout({
-  children,
+    children,
 }: Readonly<{
-  children: React.ReactNode;
+    children: React.ReactNode;
 }>) {
-  return (
-    <html lang="en">
-      <body className={notoSans.className}>
-        <div className={`${styles.wrapper}`}>
-          <Header className={styles.header} />
+    return (
+        <html lang="en">
+            <body className={notoSans.className}>
+                <div className={`${styles.wrapper}`}>
+                    <Header className={styles.header} />
 
-          <Sidebar className={styles.sidebar} />
-          <div className={styles.body}>{children}</div>
+                    <Sidebar className={styles.sidebar} />
+                    <div className={styles.body}>{children}</div>
 
-          <Footer className={styles.footer} />
-        </div>
-      </body>
-    </html>
-  );
+                    <Footer className={styles.footer} />
+                </div>
+            </body>
+        </html>
+    );
 }
 
-export const withLayout = <T extends Record<string, unknown> & IAppContext>(Component: FunctionComponent<T>) => {
-  return function withLayoutComponent(props: T) {
-    return (
-      <AppContextProvider menu={props.menu} firstCategory={props.firstCategory}>
-        <RootLayout>
-          <Component {...props} />
-        </RootLayout>
-      </AppContextProvider>
-    );
-  };
-};
+// export const withLayout = <T extends Record<string, unknown> & IAppContext>(Component: FunctionComponent<T>) => {
+//   return function withLayoutComponent(props: T) {
+//     return (
+//       <AppContextProvider menu={props.menu} firstCategory={props.firstCategory}>
+//         <RootLayout>
+//           <Component {...props} />
+//         </RootLayout>
+//       </AppContextProvider>
+//     );
+//   };
+// };

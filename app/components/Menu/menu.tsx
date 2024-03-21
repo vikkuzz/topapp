@@ -50,9 +50,9 @@ export default async function Menu() {
     const buildSecondLevel = () => {
         return (
             <div>
-                {menu.map((el) => {
+                {/* {menu.map((el) => {
                     return <div></div>;
-                })}
+                })} */}
             </div>
         );
     };
