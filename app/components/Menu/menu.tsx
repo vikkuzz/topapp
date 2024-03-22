@@ -1,33 +1,27 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
-import CoursesIcon from "../../../utils/img/courses.svg";
-import ServicesIcon from "../../../utils/img/services.svg";
-import BooksIcon from "../../../utils/img/books.svg";
-import ProductsIcon from "../../../utils/img/products.svg";
-import { FirstLevelMenuItem, MenuItem, PageItem } from "@/app/interfaces/menu.interface";
-import { TopLevelCategory } from "@/app/interfaces/page.interface";
-import cn from "classnames";
 
+import { MenuItem, PageItem } from "@/app/interfaces/menu.interface";
+
+import cn from "classnames";
 import styles from "./menu.module.css";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { firstLevelMenu } from "@/helpers/helpers";
 
-const firstLevelMenu: FirstLevelMenuItem[] = [
-    { route: "courses", name: "Курсы", icon: <CoursesIcon />, id: TopLevelCategory.Courses },
-    { route: "services", name: "Сервисы", icon: <ServicesIcon />, id: TopLevelCategory.Services },
-    { route: "books", name: "Книги", icon: <BooksIcon />, id: TopLevelCategory.Books },
-    { route: "products", name: "Продукты", icon: <ProductsIcon />, id: TopLevelCategory.Products },
-];
-
-export default function Menu({ menu }: { menu: MenuItem[] }) {
+export default function Menu({ menu, category }: { menu: MenuItem[]; category: number }) {
     const pathname = usePathname();
 
     const [localMenu, setLocalMenu] = useState<MenuItem[]>(menu);
 
+    useEffect(() => {
+        setLocalMenu(menu);
+    }, [menu]);
+
     const openSecondLevel = (secondCategory: string) => {
         setLocalMenu(
-            menu.map((m) => {
+            localMenu.map((m) => {
                 if (m._id.secondCategory == secondCategory) {
                     m.isOpened = !m.isOpened;
                 }
@@ -37,6 +31,7 @@ export default function Menu({ menu }: { menu: MenuItem[] }) {
     };
 
     const buildFirstLevel = (firstCategory: number) => {
+        console.log(firstCategory);
         return (
             <>
                 {firstLevelMenu.map((el) => {
@@ -52,6 +47,7 @@ export default function Menu({ menu }: { menu: MenuItem[] }) {
                                     <span>{el.name}</span>
                                 </div>
                             </Link>
+                            {el.id} {firstCategory}
                             {el.id == firstCategory && buildSecondLevel(el.route)}
                         </div>
                     );
@@ -60,11 +56,11 @@ export default function Menu({ menu }: { menu: MenuItem[] }) {
         );
     };
     const buildSecondLevel = (route: string) => {
+        console.log(localMenu);
         return (
             <div className={styles.secondBlock}>
                 {localMenu.map((el) => {
                     if (el.pages.map((p) => p.alias).includes(pathname.split("/")[2])) {
-                        console.log("work", pathname.split("/")[2]);
                         el.isOpened = true;
                     }
                     return (
@@ -106,7 +102,7 @@ export default function Menu({ menu }: { menu: MenuItem[] }) {
     };
     return (
         <>
-            <ul>{buildFirstLevel(0)}</ul>
+            <ul>{buildFirstLevel(category)}</ul>
         </>
     );
 }
